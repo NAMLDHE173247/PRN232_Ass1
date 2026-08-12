@@ -10,7 +10,7 @@ namespace ass01.Presentation.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin,Staff")]
+[Authorize(Roles = "Staff")]
 public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
@@ -21,9 +21,9 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCategories()
+    public async Task<IActionResult> GetCategories([FromQuery] string? search)
     {
-        var categories = await _categoryService.GetCategoriesAsync();
+        var categories = await _categoryService.GetCategoriesAsync(search);
         return Ok(categories);
     }
 
@@ -41,8 +41,15 @@ public class CategoryController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var created = await _categoryService.CreateCategoryAsync(request);
-        return CreatedAtAction(nameof(GetCategoryById), new { id = created.CategoryId }, created);
+        try
+        {
+            var created = await _categoryService.CreateCategoryAsync(request);
+            return CreatedAtAction(nameof(GetCategoryById), new { id = created.CategoryId }, created);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id}")]

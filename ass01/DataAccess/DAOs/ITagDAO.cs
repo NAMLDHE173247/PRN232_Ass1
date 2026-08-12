@@ -11,4 +11,7 @@ public interface ITagDAO
     Task AddTagAsync(Tag tag);
     Task UpdateTagAsync(Tag tag);
     Task DeleteTagAsync(Tag tag);
+    Task<bool> TagNameExistsAsync(string tagName, int? excludeTagId = null);
+    Task<bool> IsTagUsedAsync(int tagId);
+    Task<List<NewsArticle>> GetNewsArticlesByTagAsync(int tagId);
 }

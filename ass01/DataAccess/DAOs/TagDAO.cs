@@ -42,4 +42,30 @@ public class TagDAO : ITagDAO
         _context.Tags.Remove(tag);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<bool> TagNameExistsAsync(string tagName, int? excludeTagId = null)
+    {
+        var query = _context.Tags.Where(t => t.TagName == tagName);
+        if (excludeTagId.HasValue)
+        {
+            query = query.Where(t => t.TagId != excludeTagId.Value);
+        }
+        return await query.AnyAsync();
+    }
+
+    public async Task<bool> IsTagUsedAsync(int tagId)
+    {
+        return await _context.Tags
+            .Where(t => t.TagId == tagId)
+            .SelectMany(t => t.NewsArticles)
+            .AnyAsync();
+    }
+
+    public async Task<List<NewsArticle>> GetNewsArticlesByTagAsync(int tagId)
+    {
+        return await _context.Tags
+            .Where(t => t.TagId == tagId)
+            .SelectMany(t => t.NewsArticles)
+            .ToListAsync();
+    }
 }

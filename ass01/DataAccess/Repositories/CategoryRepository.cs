@@ -31,4 +31,7 @@ public class CategoryRepository : ICategoryRepository
 
     public Task<bool> HasNewsArticlesAsync(short categoryId)
         => _dao.HasNewsArticlesAsync(categoryId);
+
+    public Task<bool> CategoryNameExistsAsync(string categoryName, short? parentCategoryId, short? excludeCategoryId = null)
+        => _dao.CategoryNameExistsAsync(categoryName, parentCategoryId, excludeCategoryId);
 }

@@ -16,10 +16,18 @@ public class TagService : ITagService
         _repository = repository;
     }
 
-    public async Task<List<TagDto>> GetTagsAsync()
+    public async Task<List<TagDto>> GetTagsAsync(string? searchKeyword)
     {
         var tags = await _repository.GetTagsAsync();
-        return tags.Select(t => new TagDto
+        var query = tags.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchKeyword))
+        {
+            var keyword = searchKeyword.ToLower();
+            query = query.Where(t => t.TagName != null && t.TagName.ToLower().Contains(keyword));
+        }
+
+        return query.Select(t => new TagDto
         {
             TagId = t.TagId,
             TagName = t.TagName,
@@ -42,6 +50,9 @@ public class TagService : ITagService
 
     public async Task<TagDto> CreateTagAsync(CreateTagRequest request)
     {
+        if (await _repository.TagNameExistsAsync(request.TagName))
+            throw new ArgumentException("TagName already exists.");
+
         var tag = new Tag
         {
             TagName = request.TagName,
@@ -64,6 +75,9 @@ public class TagService : ITagService
         if (tag == null)
             throw new KeyNotFoundException("Tag not found.");
 
+        if (await _repository.TagNameExistsAsync(request.TagName, id))
+            throw new ArgumentException("TagName already exists.");
+
         tag.TagName = request.TagName;
         tag.Note = request.Note;
 
@@ -76,6 +90,22 @@ public class TagService : ITagService
         if (tag == null)
             throw new KeyNotFoundException("Tag not found.");
 
+        if (await _repository.IsTagUsedAsync(id))
+            throw new InvalidOperationException("Cannot delete this tag because it is being used by news articles.");
+
         await _repository.DeleteTagAsync(tag);
+    }
+
+    public async Task<List<object>> GetNewsArticlesByTagAsync(int tagId)
+    {
+        var articles = await _repository.GetNewsArticlesByTagAsync(tagId);
+        return articles.Select(a => new
+        {
+            a.NewsArticleId,
+            a.NewsTitle,
+            a.Headline,
+            a.CreatedDate,
+            a.NewsStatus
+        }).Cast<object>().ToList();
     }
 }

@@ -17,16 +17,28 @@ public class CategoryService : ICategoryService
         _repository = repository;
     }
 
-    public async Task<List<CategoryDto>> GetCategoriesAsync()
+    public async Task<List<CategoryDto>> GetCategoriesAsync(string? searchKeyword)
     {
         var categories = await _repository.GetCategoriesAsync();
-        return categories.Select(c => new CategoryDto
+        var query = categories.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchKeyword))
+        {
+            var keyword = searchKeyword.ToLower();
+            query = query.Where(c => 
+                (c.CategoryName != null && c.CategoryName.ToLower().Contains(keyword)) ||
+                (c.CategoryDesciption != null && c.CategoryDesciption.ToLower().Contains(keyword))
+            );
+        }
+
+        return query.Select(c => new CategoryDto
         {
             CategoryId = c.CategoryId,
             CategoryName = c.CategoryName,
-            CategoryDescription = c.CategoryDesciption ?? string.Empty, // Note: DB typo mapped correctly
+            CategoryDescription = c.CategoryDesciption ?? string.Empty,
             ParentCategoryId = c.ParentCategoryId,
-            IsActive = c.IsActive
+            IsActive = c.IsActive,
+            ArticleCount = c.NewsArticles.Count
         }).ToList();
     }
 
@@ -41,12 +53,18 @@ public class CategoryService : ICategoryService
             CategoryName = c.CategoryName,
             CategoryDescription = c.CategoryDesciption ?? string.Empty,
             ParentCategoryId = c.ParentCategoryId,
-            IsActive = c.IsActive
+            IsActive = c.IsActive,
+            ArticleCount = c.NewsArticles?.Count ?? 0
         };
     }
 
     public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryRequest request)
     {
+        if (await _repository.CategoryNameExistsAsync(request.CategoryName, request.ParentCategoryId))
+        {
+            throw new ArgumentException("A category with this name already exists under the specified parent category.");
+        }
+
         var category = new Category
         {
             CategoryName = request.CategoryName,
@@ -75,6 +93,20 @@ public class CategoryService : ICategoryService
 
         if (request.ParentCategoryId == id)
             throw new ArgumentException("Parent category cannot be the same as the current category.");
+
+        if (category.ParentCategoryId != request.ParentCategoryId)
+        {
+            var hasNews = await _repository.HasNewsArticlesAsync(id);
+            if (hasNews)
+            {
+                throw new InvalidOperationException("Cannot change parent category because this category is being used by news articles.");
+            }
+        }
+
+        if (await _repository.CategoryNameExistsAsync(request.CategoryName, request.ParentCategoryId, id))
+        {
+            throw new ArgumentException("A category with this name already exists under the specified parent category.");
+        }
 
         category.CategoryName = request.CategoryName;
         category.CategoryDesciption = request.CategoryDescription;

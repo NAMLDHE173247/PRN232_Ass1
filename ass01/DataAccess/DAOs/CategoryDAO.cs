@@ -17,12 +17,15 @@ public class CategoryDAO : ICategoryDAO
 
     public async Task<List<Category>> GetCategoriesAsync()
     {
-        return await _context.Categories.ToListAsync();
+        return await _context.Categories
+            .Include(c => c.NewsArticles)
+            .ToListAsync();
     }
 
     public async Task<Category?> GetCategoryByIdAsync(short id)
     {
         return await _context.Categories
+            .Include(c => c.NewsArticles)
             .FirstOrDefaultAsync(c => c.CategoryId == id);
     }
 
@@ -48,5 +51,15 @@ public class CategoryDAO : ICategoryDAO
     {
         return await _context.NewsArticles
             .AnyAsync(n => n.CategoryId == categoryId);
+    }
+
+    public async Task<bool> CategoryNameExistsAsync(string categoryName, short? parentCategoryId, short? excludeCategoryId = null)
+    {
+        var query = _context.Categories.Where(c => c.CategoryName == categoryName && c.ParentCategoryId == parentCategoryId);
+        if (excludeCategoryId.HasValue)
+        {
+            query = query.Where(c => c.CategoryId != excludeCategoryId.Value);
+        }
+        return await query.AnyAsync();
     }
 }

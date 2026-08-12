@@ -12,4 +12,5 @@ public interface ICategoryRepository
     Task UpdateCategoryAsync(Category category);
     Task DeleteCategoryAsync(Category category);
     Task<bool> HasNewsArticlesAsync(short categoryId);
+    Task<bool> CategoryNameExistsAsync(string categoryName, short? parentCategoryId, short? excludeCategoryId = null);
 }

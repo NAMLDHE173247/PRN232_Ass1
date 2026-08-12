@@ -9,7 +9,7 @@ namespace ass01.Presentation.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin,Staff")]
+[Authorize(Roles = "Staff")]
 public class TagController : ControllerBase
 {
     private readonly ITagService _tagService;
@@ -20,9 +20,9 @@ public class TagController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTags()
+    public async Task<IActionResult> GetTags([FromQuery] string? search)
     {
-        var tags = await _tagService.GetTagsAsync();
+        var tags = await _tagService.GetTagsAsync(search);
         return Ok(tags);
     }
 
@@ -40,8 +40,15 @@ public class TagController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var created = await _tagService.CreateTagAsync(request);
-        return CreatedAtAction(nameof(GetTagById), new { id = created.TagId }, created);
+        try
+        {
+            var created = await _tagService.CreateTagAsync(request);
+            return CreatedAtAction(nameof(GetTagById), new { id = created.TagId }, created);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id}")]
@@ -58,6 +65,10 @@ public class TagController : ControllerBase
         {
             return NotFound(new { message = "Tag not found." });
         }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("{id}")]
@@ -72,5 +83,19 @@ public class TagController : ControllerBase
         {
             return NotFound(new { message = "Tag not found." });
         }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet("{id}/news-articles")]
+    public async Task<IActionResult> GetNewsArticlesByTag(int id)
+    {
+        var tag = await _tagService.GetTagByIdAsync(id);
+        if (tag == null) return NotFound(new { message = "Tag not found." });
+
+        var articles = await _tagService.GetNewsArticlesByTagAsync(id);
+        return Ok(articles);
     }
 }

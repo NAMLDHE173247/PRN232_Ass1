@@ -9,6 +9,7 @@ public class CategoryDto
     public string CategoryDescription { get; set; } = null!;
     public short? ParentCategoryId { get; set; }
     public bool? IsActive { get; set; }
+    public int ArticleCount { get; set; }
 }
 
 public class CreateCategoryRequest

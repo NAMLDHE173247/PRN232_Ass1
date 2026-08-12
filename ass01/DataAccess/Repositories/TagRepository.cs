@@ -23,4 +23,10 @@ public class TagRepository : ITagRepository
     public Task UpdateTagAsync(Tag tag) => _dao.UpdateTagAsync(tag);
 
     public Task DeleteTagAsync(Tag tag) => _dao.DeleteTagAsync(tag);
+
+    public Task<bool> TagNameExistsAsync(string tagName, int? excludeTagId = null) => _dao.TagNameExistsAsync(tagName, excludeTagId);
+
+    public Task<bool> IsTagUsedAsync(int tagId) => _dao.IsTagUsedAsync(tagId);
+
+    public Task<List<NewsArticle>> GetNewsArticlesByTagAsync(int tagId) => _dao.GetNewsArticlesByTagAsync(tagId);
 }
