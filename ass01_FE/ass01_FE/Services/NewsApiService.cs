@@ -17,21 +17,36 @@ public class NewsApiService
         _httpClient.BaseAddress = new System.Uri(configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7087/");
     }
 
-    public async Task<List<NewsArticleDto>> GetActiveNewsAsync(string? keyword = null)
+    public async Task<(List<NewsArticleDto> Items, int TotalCount)> GetActiveNewsAsync(string? keyword = null, int skip = 0, int top = 5)
     {
-        var url = "api/news";
+        var url = $"api/news?$skip={skip}&$top={top}&$count=true";
         if (!string.IsNullOrEmpty(keyword))
         {
-            url += $"?keyword={System.Uri.EscapeDataString(keyword)}";
+            url += $"&keyword={System.Uri.EscapeDataString(keyword)}";
         }
 
         var response = await _httpClient.GetAsync(url);
         if (response.IsSuccessStatusCode)
         {
-            var articles = await response.Content.ReadFromJsonAsync<List<NewsArticleDto>>();
-            return articles ?? new List<NewsArticleDto>();
+            try
+            {
+                var odataResult = await response.Content.ReadFromJsonAsync<ODataResponse<NewsArticleDto>>();
+                if (odataResult != null && odataResult.Value != null)
+                {
+                    return (odataResult.Value, odataResult.Count);
+                }
+            }
+            catch
+            {
+                // Fallback if backend does not wrap in OData format (e.g. returns plain array)
+                var listResult = await response.Content.ReadFromJsonAsync<List<NewsArticleDto>>();
+                if (listResult != null)
+                {
+                    return (listResult, listResult.Count);
+                }
+            }
         }
-        return new List<NewsArticleDto>();
+        return (new List<NewsArticleDto>(), 0);
     }
 
     public async Task<NewsArticleDto?> GetNewsByIdAsync(string id)
