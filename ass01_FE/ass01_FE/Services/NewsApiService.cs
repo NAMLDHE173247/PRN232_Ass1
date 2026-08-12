@@ -36,9 +36,11 @@ public class NewsApiService
         var response = await _httpClient.GetAsync(url);
         if (response.IsSuccessStatusCode)
         {
+            var contentString = await response.Content.ReadAsStringAsync();
             try
             {
-                var odataResult = await response.Content.ReadFromJsonAsync<ODataResponse<NewsArticleDto>>();
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var odataResult = System.Text.Json.JsonSerializer.Deserialize<ODataResponse<NewsArticleDto>>(contentString, options);
                 if (odataResult != null && odataResult.Value != null)
                 {
                     return (odataResult.Value, odataResult.Count);
@@ -47,7 +49,8 @@ public class NewsApiService
             catch
             {
                 // Fallback if backend does not wrap in OData format (e.g. returns plain array)
-                var listResult = await response.Content.ReadFromJsonAsync<List<NewsArticleDto>>();
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var listResult = System.Text.Json.JsonSerializer.Deserialize<List<NewsArticleDto>>(contentString, options);
                 if (listResult != null)
                 {
                     return (listResult, listResult.Count);
