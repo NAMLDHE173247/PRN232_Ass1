@@ -100,14 +100,12 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("{id}/change-password")]
-    [Authorize(Roles = "Admin,Staff,Lecturer")]
+    [Authorize(Roles = "Staff,Lecturer")]
     public async Task<IActionResult> ChangePassword(short id, [FromBody] ChangePasswordRequest request)
     {
-        // Users can only change their own password, unless they are Admin.
-        var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
         var userIdStr = User.FindFirst("AccountId")?.Value;
 
-        if (userRole != "Admin" && (!short.TryParse(userIdStr, out short claimId) || claimId != id))
+        if (!short.TryParse(userIdStr, out short claimId) || claimId != id)
         {
             return Forbid();
         }
