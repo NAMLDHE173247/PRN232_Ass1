@@ -161,6 +161,6 @@ public class NewsArticleController : ControllerBase
             startDate: null, 
             endDate: null);
 
-        return Ok(articles);
+        return Ok(articles.OrderByDescending(a => a.CreatedDate));
     }
 }

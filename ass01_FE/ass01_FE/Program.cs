@@ -17,6 +17,9 @@ builder.Services.AddHttpClient<AuthApiService>();
 builder.Services.AddHttpClient<NewsApiService>();
 builder.Services.AddHttpClient<AccountApiService>();
 builder.Services.AddHttpClient<ReportApiService>();
+builder.Services.AddHttpClient<CategoryApiService>();
+builder.Services.AddHttpClient<TagApiService>();
+builder.Services.AddHttpClient<ProfileApiService>();
 
 var app = builder.Build();
 

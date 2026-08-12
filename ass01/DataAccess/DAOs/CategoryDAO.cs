@@ -31,15 +31,19 @@ public class CategoryDAO : ICategoryDAO
 
         var totalCount = await query.CountAsync();
 
-        if (skip.HasValue && skip.Value > 0)
+        int actualSkip = skip ?? 0;
+        if (actualSkip < 0) actualSkip = 0;
+
+        int actualTop = top ?? 20; // default page size
+        if (actualTop <= 0) actualTop = 20;
+        if (actualTop > 100) actualTop = 100;
+
+        if (actualSkip > 0)
         {
-            query = query.Skip(skip.Value);
+            query = query.Skip(actualSkip);
         }
 
-        if (top.HasValue && top.Value > 0)
-        {
-            query = query.Take(top.Value);
-        }
+        query = query.Take(actualTop);
 
         var items = await query.Select(c => new CategoryDto
         {
