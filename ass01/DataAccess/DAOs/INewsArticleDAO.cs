@@ -7,8 +7,8 @@ namespace ass01.DataAccess.DAOs;
 
 public interface INewsArticleDAO
 {
-    Task<List<NewsArticle>> GetNewsArticlesAsync();
-    Task<NewsArticle?> GetNewsArticleByIdAsync(string id);
+    Task<List<NewsArticle>> GetNewsArticlesAsync(bool isStaff);
+    Task<NewsArticle?> GetNewsArticleByIdAsync(string id, bool isStaff);
     Task AddNewsArticleAsync(NewsArticle article);
     Task UpdateNewsArticleAsync(NewsArticle article);
     Task DeleteNewsArticleAsync(NewsArticle article);

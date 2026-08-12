@@ -16,22 +16,36 @@ public class NewsArticleDAO : INewsArticleDAO
         _context = context;
     }
 
-    public async Task<List<NewsArticle>> GetNewsArticlesAsync()
+    public async Task<List<NewsArticle>> GetNewsArticlesAsync(bool isStaff)
     {
-        return await _context.NewsArticles
+        var query = _context.NewsArticles
             .Include(n => n.Category)
             .Include(n => n.Tags)
             .Include(n => n.CreatedBy)
-            .ToListAsync();
+            .AsQueryable();
+
+        if (!isStaff)
+        {
+            query = query.Where(n => n.NewsStatus == true);
+        }
+
+        return await query.ToListAsync();
     }
 
-    public async Task<NewsArticle?> GetNewsArticleByIdAsync(string id)
+    public async Task<NewsArticle?> GetNewsArticleByIdAsync(string id, bool isStaff)
     {
-        return await _context.NewsArticles
+        var query = _context.NewsArticles
             .Include(n => n.Category)
             .Include(n => n.Tags)
             .Include(n => n.CreatedBy)
-            .FirstOrDefaultAsync(n => n.NewsArticleId == id);
+            .AsQueryable();
+
+        if (!isStaff)
+        {
+            query = query.Where(n => n.NewsStatus == true);
+        }
+
+        return await query.FirstOrDefaultAsync(n => n.NewsArticleId == id);
     }
 
     public async Task AddNewsArticleAsync(NewsArticle article)

@@ -15,9 +15,9 @@ public class NewsArticleRepository : INewsArticleRepository
         _dao = dao;
     }
 
-    public Task<List<NewsArticle>> GetNewsArticlesAsync() => _dao.GetNewsArticlesAsync();
+    public Task<List<NewsArticle>> GetNewsArticlesAsync(bool isStaff) => _dao.GetNewsArticlesAsync(isStaff);
 
-    public Task<NewsArticle?> GetNewsArticleByIdAsync(string id) => _dao.GetNewsArticleByIdAsync(id);
+    public Task<NewsArticle?> GetNewsArticleByIdAsync(string id, bool isStaff) => _dao.GetNewsArticleByIdAsync(id, isStaff);
 
     public Task AddNewsArticleAsync(NewsArticle article) => _dao.AddNewsArticleAsync(article);
 

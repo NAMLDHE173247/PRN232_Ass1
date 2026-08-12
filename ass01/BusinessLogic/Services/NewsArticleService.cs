@@ -20,15 +20,15 @@ public class NewsArticleService : INewsArticleService
         _tagRepo = tagRepo;
     }
 
-    public async Task<List<NewsArticleDto>> GetNewsArticlesAsync()
+    public async Task<List<NewsArticleDto>> GetNewsArticlesAsync(bool isStaff)
     {
-        var articles = await _newsRepo.GetNewsArticlesAsync();
+        var articles = await _newsRepo.GetNewsArticlesAsync(isStaff);
         return articles.Select(MapToDto).ToList();
     }
 
-    public async Task<NewsArticleDto?> GetNewsArticleByIdAsync(string id)
+    public async Task<NewsArticleDto?> GetNewsArticleByIdAsync(string id, bool isStaff)
     {
-        var article = await _newsRepo.GetNewsArticleByIdAsync(id);
+        var article = await _newsRepo.GetNewsArticleByIdAsync(id, isStaff);
         if (article == null) return null;
         return MapToDto(article);
     }
@@ -66,13 +66,13 @@ public class NewsArticleService : INewsArticleService
         await _newsRepo.AddNewsArticleAsync(article);
 
         // Fetch again to get fully loaded navigational properties
-        var created = await _newsRepo.GetNewsArticleByIdAsync(newArticleId);
+        var created = await _newsRepo.GetNewsArticleByIdAsync(newArticleId, true);
         return MapToDto(created!);
     }
 
     public async Task UpdateNewsArticleAsync(string id, UpdateNewsArticleRequest request, short currentUserId)
     {
-        var article = await _newsRepo.GetNewsArticleByIdAsync(id);
+        var article = await _newsRepo.GetNewsArticleByIdAsync(id, true);
         if (article == null)
             throw new KeyNotFoundException("NewsArticle not found.");
 
@@ -105,7 +105,7 @@ public class NewsArticleService : INewsArticleService
 
     public async Task DeleteNewsArticleAsync(string id)
     {
-        var article = await _newsRepo.GetNewsArticleByIdAsync(id);
+        var article = await _newsRepo.GetNewsArticleByIdAsync(id, true);
         if (article == null)
             throw new KeyNotFoundException("NewsArticle not found.");
 
@@ -119,7 +119,7 @@ public class NewsArticleService : INewsArticleService
 
     public async Task<List<NewsArticleDto>> GetRelatedNewsArticlesAsync(string id)
     {
-        var article = await _newsRepo.GetNewsArticleByIdAsync(id);
+        var article = await _newsRepo.GetNewsArticleByIdAsync(id, true);
         if (article == null)
             throw new KeyNotFoundException("NewsArticle not found.");
 

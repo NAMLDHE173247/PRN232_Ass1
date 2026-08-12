@@ -25,14 +25,16 @@ public class NewsArticleController : ControllerBase
     [EnableQuery]
     public async Task<IActionResult> GetNewsArticles()
     {
-        var articles = await _newsService.GetNewsArticlesAsync();
+        bool isStaff = User.IsInRole("Staff");
+        var articles = await _newsService.GetNewsArticlesAsync(isStaff);
         return Ok(articles);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetNewsArticleById(string id)
     {
-        var article = await _newsService.GetNewsArticleByIdAsync(id);
+        bool isStaff = User.IsInRole("Staff");
+        var article = await _newsService.GetNewsArticleByIdAsync(id, isStaff);
         if (article == null) return NotFound(new { message = "NewsArticle not found." });
         return Ok(article);
     }
