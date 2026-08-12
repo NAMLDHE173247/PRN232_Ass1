@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ass01.BusinessLogic.DTOs.Category;
 using ass01.Models;
 
 namespace ass01.DataAccess.Repositories;
 
 public interface ICategoryRepository
 {
+    Task<List<CategoryDto>> GetCategoriesWithArticleCountAsync(string? searchKeyword);
     Task<List<Category>> GetCategoriesAsync();
     Task<Category?> GetCategoryByIdAsync(short id);
     Task AddCategoryAsync(Category category);

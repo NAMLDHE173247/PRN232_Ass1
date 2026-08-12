@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ass01.Models;
+using ass01.BusinessLogic.DTOs.Category;
 using ass01.DataAccess.DAOs;
+using ass01.Models;
 
 namespace ass01.DataAccess.Repositories;
 
@@ -13,6 +14,9 @@ public class CategoryRepository : ICategoryRepository
     {
         _dao = dao;
     }
+
+    public Task<List<CategoryDto>> GetCategoriesWithArticleCountAsync(string? searchKeyword)
+        => _dao.GetCategoriesWithArticleCountAsync(searchKeyword);
 
     public Task<List<Category>> GetCategoriesAsync()
         => _dao.GetCategoriesAsync();

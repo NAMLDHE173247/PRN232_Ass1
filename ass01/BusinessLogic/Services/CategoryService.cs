@@ -19,27 +19,7 @@ public class CategoryService : ICategoryService
 
     public async Task<List<CategoryDto>> GetCategoriesAsync(string? searchKeyword)
     {
-        var categories = await _repository.GetCategoriesAsync();
-        var query = categories.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(searchKeyword))
-        {
-            var keyword = searchKeyword.ToLower();
-            query = query.Where(c => 
-                (c.CategoryName != null && c.CategoryName.ToLower().Contains(keyword)) ||
-                (c.CategoryDesciption != null && c.CategoryDesciption.ToLower().Contains(keyword))
-            );
-        }
-
-        return query.Select(c => new CategoryDto
-        {
-            CategoryId = c.CategoryId,
-            CategoryName = c.CategoryName,
-            CategoryDescription = c.CategoryDesciption ?? string.Empty,
-            ParentCategoryId = c.ParentCategoryId,
-            IsActive = c.IsActive,
-            ArticleCount = c.NewsArticles.Count
-        }).ToList();
+        return await _repository.GetCategoriesWithArticleCountAsync(searchKeyword);
     }
 
     public async Task<CategoryDto?> GetCategoryByIdAsync(short id)

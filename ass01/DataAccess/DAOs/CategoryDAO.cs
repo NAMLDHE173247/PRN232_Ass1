@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using ass01.Models;
+using ass01.BusinessLogic.DTOs.Category;
 using Microsoft.EntityFrameworkCore;
 
 namespace ass01.DataAccess.DAOs;
@@ -15,11 +16,33 @@ public class CategoryDAO : ICategoryDAO
         _context = context;
     }
 
+    public async Task<List<CategoryDto>> GetCategoriesWithArticleCountAsync(string? searchKeyword)
+    {
+        var query = _context.Categories.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchKeyword))
+        {
+            var keyword = searchKeyword.ToLower();
+            query = query.Where(c => 
+                (c.CategoryName != null && c.CategoryName.ToLower().Contains(keyword)) ||
+                (c.CategoryDesciption != null && c.CategoryDesciption.ToLower().Contains(keyword))
+            );
+        }
+
+        return await query.Select(c => new CategoryDto
+        {
+            CategoryId = c.CategoryId,
+            CategoryName = c.CategoryName,
+            CategoryDescription = c.CategoryDesciption ?? string.Empty,
+            ParentCategoryId = c.ParentCategoryId,
+            IsActive = c.IsActive,
+            ArticleCount = c.NewsArticles.Count
+        }).ToListAsync();
+    }
+
     public async Task<List<Category>> GetCategoriesAsync()
     {
-        return await _context.Categories
-            .Include(c => c.NewsArticles)
-            .ToListAsync();
+        return await _context.Categories.ToListAsync();
     }
 
     public async Task<Category?> GetCategoryByIdAsync(short id)
