@@ -11,7 +11,7 @@ using System.Collections.Generic;
 namespace ass01.Presentation.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/news")]
 public class NewsArticleController : ControllerBase
 {
     private readonly INewsArticleService _newsService;
