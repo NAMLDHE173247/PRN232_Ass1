@@ -1,4 +1,4 @@
-@model IEnumerable<dynamic>
+@model IEnumerable<ass01_FE.Models.News.TagDto>
 @{
     ViewData["Title"] = "Tag Management";
 }
@@ -28,13 +28,13 @@
                 foreach (var tag in Model)
                 {
                     <tr>
-                        <td>@tag.tagId</td>
-                        <td>@tag.tagName</td>
-                        <td>@tag.note</td>
+                        <td>@tag.TagId</td>
+                        <td>@tag.TagName</td>
+                        <td>@tag.Note</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-info" onclick="viewArticles(@tag.tagId, '@tag.tagName?.Replace("'", "\\'")')">Articles</button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal(@tag.tagId, '@tag.tagName?.Replace("'", "\\'")', '@tag.note?.Replace("'", "\\'")')">Edit</button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTag(@tag.tagId)">Delete</button>
+                            <button class="btn btn-sm btn-outline-info" onclick="viewArticles(@tag.TagId, '@tag.TagName?.Replace("'", "\\'")')">Articles</button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal(@tag.TagId, '@tag.TagName?.Replace("'", "\\'")', '@tag.Note?.Replace("'", "\\'")')">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTag(@tag.TagId)">Delete</button>
                         </td>
                     </tr>
                 }

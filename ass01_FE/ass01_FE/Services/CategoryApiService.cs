@@ -61,7 +61,17 @@ namespace ass01_FE.Services
 
     public class CategoryListResult
     {
-        public List<object> Value { get; set; } = new();
+        public List<CategoryDto> Value { get; set; } = new();
         public int Count { get; set; }
+    }
+
+    public class CategoryDto
+    {
+        public short CategoryId { get; set; }
+        public string? CategoryName { get; set; }
+        public string? CategoryDescription { get; set; }
+        public short? ParentCategoryId { get; set; }
+        public bool? IsActive { get; set; }
+        public int ArticleCount { get; set; }
     }
 }

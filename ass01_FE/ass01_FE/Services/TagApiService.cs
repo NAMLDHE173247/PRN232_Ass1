@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using ass01_FE.Models.News;
 
 namespace ass01_FE.Services
 {
@@ -22,16 +23,16 @@ namespace ass01_FE.Services
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        public async Task<List<object>?> GetTagsAsync(string token)
+        public async Task<List<TagDto>?> GetTagsAsync(string token)
         {
             AddAuthHeader(token);
-            return await _httpClient.GetFromJsonAsync<List<object>>("/api/tag");
+            return await _httpClient.GetFromJsonAsync<List<TagDto>>("/api/tag");
         }
 
-        public async Task<object?> GetTagByIdAsync(string token, int id)
+        public async Task<TagDto?> GetTagByIdAsync(string token, int id)
         {
             AddAuthHeader(token);
-            return await _httpClient.GetFromJsonAsync<object>($"/api/tag/{id}");
+            return await _httpClient.GetFromJsonAsync<TagDto>($"/api/tag/{id}");
         }
 
         public async Task<HttpResponseMessage> CreateTagAsync(string token, object payload)

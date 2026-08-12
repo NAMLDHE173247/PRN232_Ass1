@@ -1,10 +1,9 @@
-@model dynamic
+@model ass01_FE.Services.CategoryListResult
 @{
     ViewData["Title"] = "Category Management";
     
-    // We expect Model to be a dynamic containing "value" (List) and "count" (int)
-    var items = Model?.value as IEnumerable<dynamic>;
-    int totalCount = Model?.count ?? 0;
+    var items = Model?.Value;
+    int totalCount = Model?.Count ?? 0;
     
     int skip = ViewBag.Skip ?? 0;
     int top = ViewBag.Top ?? 10;
@@ -62,18 +61,18 @@
                 foreach (var cat in items)
                 {
                     <tr>
-                        <td>@cat.categoryId</td>
-                        <td>@cat.categoryName</td>
-                        <td>@cat.categoryDescription</td>
-                        <td>@(cat.parentCategoryId?.ToString() ?? "None")</td>
+                        <td>@cat.CategoryId</td>
+                        <td>@cat.CategoryName</td>
+                        <td>@cat.CategoryDescription</td>
+                        <td>@(cat.ParentCategoryId?.ToString() ?? "None")</td>
                         <td>
-                            @if (cat.isActive == true) { <span class="badge bg-success">Active</span> }
+                            @if (cat.IsActive == true) { <span class="badge bg-success">Active</span> }
                             else { <span class="badge bg-secondary">Inactive</span> }
                         </td>
-                        <td>@cat.articleCount</td>
+                        <td>@cat.ArticleCount</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal(@cat.categoryId, '@cat.categoryName?.Replace("'", "\\'")', '@cat.categoryDescription?.Replace("'", "\\'")', @(cat.parentCategoryId?.ToString() ?? "null"), @(cat.isActive == true ? "true" : "false"))">Edit</button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(@cat.categoryId)">Delete</button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal(@cat.CategoryId, '@cat.CategoryName?.Replace("'", "\\'")', '@cat.CategoryDescription?.Replace("'", "\\'")', @(cat.ParentCategoryId?.ToString() ?? "null"), @(cat.IsActive == true ? "true" : "false"))">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(@cat.CategoryId)">Delete</button>
                         </td>
                     </tr>
                 }
