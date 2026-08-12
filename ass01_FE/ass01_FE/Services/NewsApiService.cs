@@ -14,7 +14,8 @@ public class NewsApiService
     public NewsApiService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new System.Uri(configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7087/");
+        var baseUrl = configuration["ApiSettings:BaseUrl"] ?? throw new System.InvalidOperationException("ApiSettings:BaseUrl is not configured.");
+        _httpClient.BaseAddress = new System.Uri(baseUrl);
     }
 
     public async Task<(List<NewsArticleDto> Items, int TotalCount)> GetActiveNewsAsync(string? keyword = null, int skip = 0, int top = 5)

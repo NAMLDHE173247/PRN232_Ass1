@@ -29,8 +29,8 @@
                         
                         @if (role == "Admin")
                         {
-                            <li class="nav-item"><a class="nav-link text-dark" href="#">Accounts</a></li>
-                            <li class="nav-item"><a class="nav-link text-dark" href="#">Reports</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Index">Accounts</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Report" asp-action="Index">Reports</a></li>
                         }
                         else if (role == "Staff")
                         {

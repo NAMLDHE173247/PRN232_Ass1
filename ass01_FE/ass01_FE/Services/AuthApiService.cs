@@ -13,7 +13,8 @@ public class AuthApiService
     public AuthApiService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new System.Uri(configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7087/");
+        var baseUrl = configuration["ApiSettings:BaseUrl"] ?? throw new System.InvalidOperationException("ApiSettings:BaseUrl is not configured.");
+        _httpClient.BaseAddress = new System.Uri(baseUrl);
     }
 
     public async Task<LoginResponse?> LoginAsync(LoginViewModel model)

@@ -15,6 +15,8 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddHttpClient<AuthApiService>();
 builder.Services.AddHttpClient<NewsApiService>();
+builder.Services.AddHttpClient<AccountApiService>();
+builder.Services.AddHttpClient<ReportApiService>();
 
 var app = builder.Build();
 
