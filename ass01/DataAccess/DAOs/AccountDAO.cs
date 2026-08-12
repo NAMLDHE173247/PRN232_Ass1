@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 using ass01.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,5 +13,46 @@ public class AccountDAO : IAccountDAO
     public AccountDAO(FunewsManagementContext context)
     {
         _context = context;
+    }
+
+    public async Task<SystemAccount?> GetAccountByEmailAsync(string email)
+    {
+        return await _context.SystemAccounts
+            .FirstOrDefaultAsync(a => a.AccountEmail == email);
+    }
+
+    public async Task<List<SystemAccount>> GetAccountsAsync()
+    {
+        return await _context.SystemAccounts.ToListAsync();
+    }
+
+    public async Task<SystemAccount?> GetAccountByIdAsync(short id)
+    {
+        return await _context.SystemAccounts
+            .FirstOrDefaultAsync(a => a.AccountId == id);
+    }
+
+    public async Task AddAccountAsync(SystemAccount account)
+    {
+        await _context.SystemAccounts.AddAsync(account);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAccountAsync(SystemAccount account)
+    {
+        _context.SystemAccounts.Update(account);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAccountAsync(SystemAccount account)
+    {
+        _context.SystemAccounts.Remove(account);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> HasCreatedNewsAsync(short accountId)
+    {
+        return await _context.NewsArticles
+            .AnyAsync(n => n.CreatedById == accountId);
     }
 }
