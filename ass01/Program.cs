@@ -3,6 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.OData;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using ass01.BusinessLogic.DTOs.NewsArticle;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,8 +35,21 @@ builder.Services.AddScoped<ass01.BusinessLogic.Services.IAuthService, ass01.Busi
 builder.Services.AddScoped<ass01.BusinessLogic.Services.IAccountService, ass01.BusinessLogic.Services.AccountService>();
 builder.Services.AddScoped<ass01.BusinessLogic.Services.ICategoryService, ass01.BusinessLogic.Services.CategoryService>();
 builder.Services.AddScoped<ass01.BusinessLogic.Services.ITagService, ass01.BusinessLogic.Services.TagService>();
+builder.Services.AddScoped<ass01.BusinessLogic.Services.INewsArticleService, ass01.BusinessLogic.Services.NewsArticleService>();
 
-builder.Services.AddControllers();
+// Configure OData EDM Model
+static IEdmModel GetEdmModel()
+{
+    var builder = new ODataConventionModelBuilder();
+    builder.EntitySet<NewsArticleDto>("NewsArticle");
+    return builder.GetEdmModel();
+}
+
+builder.Services.AddControllers()
+    .AddOData(options => options
+        .Select().Filter().OrderBy().Expand().SetMaxTop(100).SkipToken()
+        .AddRouteComponents("odata", GetEdmModel())
+    );
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
