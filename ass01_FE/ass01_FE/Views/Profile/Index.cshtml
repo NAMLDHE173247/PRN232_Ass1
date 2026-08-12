@@ -1,0 +1,99 @@
+@model ass01_FE.Models.Account.AccountDto
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">My Profile</h4>
+            </div>
+            <div class="card-body">
+                <div id="alertContainer"></div>
+
+                @if (Model != null)
+                {
+                    <form id="profileForm" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Account ID</label>
+                            <input type="text" class="form-control" value="@Model.AccountId" disabled />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" id="AccountName" value="@Model.AccountName" required maxlength="100" />
+                            <div class="invalid-feedback">Name is required (max 100).</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="AccountEmail" value="@Model.AccountEmail" required maxlength="70" />
+                            <div class="invalid-feedback">A valid email is required (max 70).</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <input type="text" class="form-control" value="@(Model.AccountRole == 1 ? "Staff" : Model.AccountRole == 2 ? "Lecturer" : "Admin")" disabled />
+                        </div>
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-primary" id="btnUpdate" onclick="updateProfile()">Update Profile</button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-danger">Could not load profile data.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showAlert(msg, type = 'success') {
+            const box = document.getElementById('alertContainer');
+            box.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show">
+                ${msg}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>`;
+        }
+
+        async function updateProfile() {
+            const form = document.getElementById('profileForm');
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const btn = document.getElementById('btnUpdate');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Updating...';
+            btn.disabled = true;
+
+            const data = {
+                accountName: document.getElementById('AccountName').value,
+                accountEmail: document.getElementById('AccountEmail').value
+            };
+
+            try {
+                const response = await fetch('/Profile/Update', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const res = await response.json();
+                
+                if (response.ok) {
+                    showAlert(res.message, 'success');
+                } else {
+                    showAlert(res.message || 'Failed to update profile.', 'danger');
+                }
+            } catch (err) {
+                showAlert('Network error occurred.', 'danger');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+}

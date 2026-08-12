@@ -2,6 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using ass01_FE.Models.Account;
 
 namespace ass01_FE.Services
 {
@@ -21,10 +22,10 @@ namespace ass01_FE.Services
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
-        public async Task<object?> GetMyProfileAsync(string token)
+        public async Task<AccountDto?> GetMyProfileAsync(string token)
         {
             AddAuthHeader(token);
-            return await _httpClient.GetFromJsonAsync<object>("/api/profile");
+            return await _httpClient.GetFromJsonAsync<AccountDto>("/api/profile");
         }
 
         public async Task<HttpResponseMessage> UpdateMyProfileAsync(string token, object payload)
