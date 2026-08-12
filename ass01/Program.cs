@@ -29,6 +29,8 @@ builder.Services.AddScoped<ass01.DataAccess.Repositories.ITagRepository, ass01.D
 // Register Services
 builder.Services.AddScoped<ass01.BusinessLogic.Services.IAuthService, ass01.BusinessLogic.Services.AuthService>();
 builder.Services.AddScoped<ass01.BusinessLogic.Services.IAccountService, ass01.BusinessLogic.Services.AccountService>();
+builder.Services.AddScoped<ass01.BusinessLogic.Services.ICategoryService, ass01.BusinessLogic.Services.CategoryService>();
+builder.Services.AddScoped<ass01.BusinessLogic.Services.ITagService, ass01.BusinessLogic.Services.TagService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

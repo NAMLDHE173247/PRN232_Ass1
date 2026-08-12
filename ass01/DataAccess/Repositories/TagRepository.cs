@@ -13,4 +13,14 @@ public class TagRepository : ITagRepository
     {
         _dao = dao;
     }
+
+    public Task<List<Tag>> GetTagsAsync() => _dao.GetTagsAsync();
+
+    public Task<Tag?> GetTagByIdAsync(int id) => _dao.GetTagByIdAsync(id);
+
+    public Task AddTagAsync(Tag tag) => _dao.AddTagAsync(tag);
+
+    public Task UpdateTagAsync(Tag tag) => _dao.UpdateTagAsync(tag);
+
+    public Task DeleteTagAsync(Tag tag) => _dao.DeleteTagAsync(tag);
 }

@@ -6,4 +6,9 @@ namespace ass01.DataAccess.Repositories;
 
 public interface ITagRepository
 {
+    Task<List<Tag>> GetTagsAsync();
+    Task<Tag?> GetTagByIdAsync(int id);
+    Task AddTagAsync(Tag tag);
+    Task UpdateTagAsync(Tag tag);
+    Task DeleteTagAsync(Tag tag);
 }

@@ -13,4 +13,22 @@ public class CategoryRepository : ICategoryRepository
     {
         _dao = dao;
     }
+
+    public Task<List<Category>> GetCategoriesAsync()
+        => _dao.GetCategoriesAsync();
+
+    public Task<Category?> GetCategoryByIdAsync(short id)
+        => _dao.GetCategoryByIdAsync(id);
+
+    public Task AddCategoryAsync(Category category)
+        => _dao.AddCategoryAsync(category);
+
+    public Task UpdateCategoryAsync(Category category)
+        => _dao.UpdateCategoryAsync(category);
+
+    public Task DeleteCategoryAsync(Category category)
+        => _dao.DeleteCategoryAsync(category);
+
+    public Task<bool> HasNewsArticlesAsync(short categoryId)
+        => _dao.HasNewsArticlesAsync(categoryId);
 }
