@@ -55,4 +55,23 @@ public class ProfileController : Controller
             return BadRequest(new { message = error });
         }
     }
+
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(short id, [FromBody] object model)
+    {
+        if (!IsStaff()) return Unauthorized("Staff access required.");
+        
+        var token = GetToken();
+        var response = await _profileApiService.ChangePasswordAsync(token, id, model);
+        
+        if (response.IsSuccessStatusCode)
+        {
+            return Ok(new { message = "Password changed successfully." });
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            return BadRequest(new { message = error });
+        }
+    }
 }

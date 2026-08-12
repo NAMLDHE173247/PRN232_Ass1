@@ -45,6 +45,40 @@
             </div>
         </div>
     </div>
+    
+    @if (Model != null)
+    {
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Change Password</h4>
+                </div>
+                <div class="card-body">
+                    <div id="pwdAlertContainer"></div>
+                    <form id="pwdForm" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="CurrentPassword" required minlength="6" />
+                            <div class="invalid-feedback">Current password is required.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="NewPassword" required minlength="6" />
+                            <div class="invalid-feedback">New password must be at least 6 characters.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="ConfirmNewPassword" required minlength="6" />
+                            <div class="invalid-feedback">Please confirm your new password.</div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-danger" id="btnChangePwd" onclick="changePassword()">Change Password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 @section Scripts {
@@ -94,6 +128,66 @@
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
+        }
+
+        async function changePassword() {
+            const form = document.getElementById('pwdForm');
+            const newPwd = document.getElementById('NewPassword').value;
+            const confirmPwd = document.getElementById('ConfirmNewPassword').value;
+            
+            if (newPwd !== confirmPwd) {
+                showPwdAlert('New password and confirm password do not match.', 'danger');
+                return;
+            }
+
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const btn = document.getElementById('btnChangePwd');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Changing...';
+            btn.disabled = true;
+
+            const data = {
+                currentPassword: document.getElementById('CurrentPassword').value,
+                newPassword: newPwd,
+                confirmNewPassword: confirmPwd
+            };
+
+            const accountId = @(Model?.AccountId ?? 0);
+
+            try {
+                const response = await fetch(`/Profile/ChangePassword/${accountId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const res = await response.json();
+                
+                if (response.ok) {
+                    showPwdAlert(res.message, 'success');
+                    form.reset();
+                    form.classList.remove('was-validated');
+                } else {
+                    showPwdAlert(res.message || 'Failed to change password.', 'danger');
+                }
+            } catch (err) {
+                showPwdAlert('Network error occurred.', 'danger');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function showPwdAlert(msg, type = 'success') {
+            const box = document.getElementById('pwdAlertContainer');
+            box.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show">
+                ${msg}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>`;
         }
     </script>
 }

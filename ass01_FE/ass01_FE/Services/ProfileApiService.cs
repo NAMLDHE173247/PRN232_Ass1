@@ -33,5 +33,11 @@ namespace ass01_FE.Services
             AddAuthHeader(token);
             return await _httpClient.PutAsJsonAsync("/api/profile", payload);
         }
+
+        public async Task<HttpResponseMessage> ChangePasswordAsync(string token, short id, object payload)
+        {
+            AddAuthHeader(token);
+            return await _httpClient.PostAsJsonAsync($"/api/account/{id}/change-password", payload);
+        }
     }
 }
