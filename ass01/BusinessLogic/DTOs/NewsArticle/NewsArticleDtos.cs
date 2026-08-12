@@ -7,6 +7,7 @@ namespace ass01.BusinessLogic.DTOs.NewsArticle;
 
 public class NewsArticleDto
 {
+    [Key]
     public string NewsArticleId { get; set; } = null!;
     public string? NewsTitle { get; set; }
     public string Headline { get; set; } = null!;
