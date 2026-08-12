@@ -100,9 +100,25 @@ public class NewsApiService
         
         if (response.IsSuccessStatusCode)
         {
-            var odataResult = await response.Content.ReadFromJsonAsync<ODataResponse<NewsArticleDto>>();
-            if (odataResult != null && odataResult.Value != null)
-                return (odataResult.Value, odataResult.Count);
+            var contentString = await response.Content.ReadAsStringAsync();
+            try
+            {
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var odataResult = System.Text.Json.JsonSerializer.Deserialize<ODataResponse<NewsArticleDto>>(contentString, options);
+                if (odataResult != null && odataResult.Value != null)
+                {
+                    return (odataResult.Value, odataResult.Count);
+                }
+            }
+            catch
+            {
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var listResult = System.Text.Json.JsonSerializer.Deserialize<List<NewsArticleDto>>(contentString, options);
+                if (listResult != null)
+                {
+                    return (listResult, listResult.Count);
+                }
+            }
         }
         return (new List<NewsArticleDto>(), 0);
     }
