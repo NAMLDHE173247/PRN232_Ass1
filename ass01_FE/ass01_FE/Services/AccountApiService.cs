@@ -40,9 +40,11 @@ public class AccountApiService
         if (response.IsSuccessStatusCode)
         {
             // OData might wrap the response
+            var contentString = await response.Content.ReadAsStringAsync();
             try
             {
-                var odataResult = await response.Content.ReadFromJsonAsync<ODataResponse<AccountDto>>();
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var odataResult = System.Text.Json.JsonSerializer.Deserialize<ODataResponse<AccountDto>>(contentString, options);
                 if (odataResult != null && odataResult.Value != null)
                 {
                     return odataResult.Value;
@@ -50,7 +52,8 @@ public class AccountApiService
             }
             catch
             {
-                var listResult = await response.Content.ReadFromJsonAsync<List<AccountDto>>();
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var listResult = System.Text.Json.JsonSerializer.Deserialize<List<AccountDto>>(contentString, options);
                 if (listResult != null) return listResult;
             }
         }
