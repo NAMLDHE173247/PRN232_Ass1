@@ -10,7 +10,7 @@ namespace ass01.Presentation.Controllers;
 
 [ApiController]
 [Route("api/profile")]
-[Authorize] // Allow any authenticated user (Staff, Admin, Lecturer) to manage their profile
+[Authorize(Roles = "Staff")]
 public class ProfileController : ControllerBase
 {
     private readonly IAccountService _accountService;
@@ -23,7 +23,7 @@ public class ProfileController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetMyProfile()
     {
-        var userIdStr = User.FindFirst("AccountId")?.Value;
+        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
         if (!short.TryParse(userIdStr, out short currentUserId))
         {
@@ -42,7 +42,7 @@ public class ProfileController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateProfileRequest request)
     {
-        var userIdStr = User.FindFirst("AccountId")?.Value;
+        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
         if (!short.TryParse(userIdStr, out short currentUserId))
         {

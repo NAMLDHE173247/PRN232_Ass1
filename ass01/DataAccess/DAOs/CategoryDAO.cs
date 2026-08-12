@@ -16,7 +16,7 @@ public class CategoryDAO : ICategoryDAO
         _context = context;
     }
 
-    public async Task<List<CategoryDto>> GetCategoriesWithArticleCountAsync(string? searchKeyword)
+    public async Task<(List<CategoryDto> Items, int TotalCount)> GetCategoriesWithArticleCountAsync(string? searchKeyword, int? skip = null, int? top = null)
     {
         var query = _context.Categories.AsQueryable();
 
@@ -29,7 +29,19 @@ public class CategoryDAO : ICategoryDAO
             );
         }
 
-        return await query.Select(c => new CategoryDto
+        var totalCount = await query.CountAsync();
+
+        if (skip.HasValue && skip.Value > 0)
+        {
+            query = query.Skip(skip.Value);
+        }
+
+        if (top.HasValue && top.Value > 0)
+        {
+            query = query.Take(top.Value);
+        }
+
+        var items = await query.Select(c => new CategoryDto
         {
             CategoryId = c.CategoryId,
             CategoryName = c.CategoryName,
@@ -38,6 +50,8 @@ public class CategoryDAO : ICategoryDAO
             IsActive = c.IsActive,
             ArticleCount = c.NewsArticles.Count
         }).ToListAsync();
+
+        return (items, totalCount);
     }
 
     public async Task<List<Category>> GetCategoriesAsync()

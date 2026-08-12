@@ -6,7 +6,7 @@ namespace ass01.BusinessLogic.Services;
 
 public interface ICategoryService
 {
-    Task<List<CategoryDto>> GetCategoriesAsync(string? searchKeyword);
+    Task<(List<CategoryDto> Items, int TotalCount)> GetCategoriesAsync(string? searchKeyword, int? skip = null, int? top = null);
     Task<CategoryDto?> GetCategoryByIdAsync(short id);
     Task<CategoryDto> CreateCategoryAsync(CreateCategoryRequest request);
     Task UpdateCategoryAsync(short id, UpdateCategoryRequest request);

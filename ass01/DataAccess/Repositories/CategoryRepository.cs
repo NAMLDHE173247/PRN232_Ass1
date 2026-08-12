@@ -15,8 +15,8 @@ public class CategoryRepository : ICategoryRepository
         _dao = dao;
     }
 
-    public Task<List<CategoryDto>> GetCategoriesWithArticleCountAsync(string? searchKeyword)
-        => _dao.GetCategoriesWithArticleCountAsync(searchKeyword);
+    public Task<(List<CategoryDto> Items, int TotalCount)> GetCategoriesWithArticleCountAsync(string? searchKeyword, int? skip = null, int? top = null)
+        => _dao.GetCategoriesWithArticleCountAsync(searchKeyword, skip, top);
 
     public Task<List<Category>> GetCategoriesAsync()
         => _dao.GetCategoriesAsync();

@@ -17,9 +17,9 @@ public class CategoryService : ICategoryService
         _repository = repository;
     }
 
-    public async Task<List<CategoryDto>> GetCategoriesAsync(string? searchKeyword)
+    public async Task<(List<CategoryDto> Items, int TotalCount)> GetCategoriesAsync(string? searchKeyword, int? skip = null, int? top = null)
     {
-        return await _repository.GetCategoriesWithArticleCountAsync(searchKeyword);
+        return await _repository.GetCategoriesWithArticleCountAsync(searchKeyword, skip, top);
     }
 
     public async Task<CategoryDto?> GetCategoryByIdAsync(short id)

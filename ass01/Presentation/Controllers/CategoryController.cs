@@ -21,10 +21,10 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCategories([FromQuery] string? search)
+    public async Task<IActionResult> GetCategories([FromQuery] string? search, [FromQuery] int? skip = null, [FromQuery] int? top = null)
     {
-        var categories = await _categoryService.GetCategoriesAsync(search);
-        return Ok(categories);
+        var result = await _categoryService.GetCategoriesAsync(search, skip, top);
+        return Ok(new { value = result.Items, count = result.TotalCount });
     }
 
     [HttpGet("{id}")]

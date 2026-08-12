@@ -77,7 +77,7 @@ public class AuthService : IAuthService
             new Claim(JwtRegisteredClaimNames.Sub, email),
             new Claim(JwtRegisteredClaimNames.Email, email),
             new Claim(ClaimTypes.Role, role),
-            new Claim("AccountId", accountId.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, accountId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

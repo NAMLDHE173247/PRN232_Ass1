@@ -103,7 +103,7 @@ public class AccountController : ControllerBase
     [Authorize(Roles = "Staff,Lecturer")]
     public async Task<IActionResult> ChangePassword(short id, [FromBody] ChangePasswordRequest request)
     {
-        var userIdStr = User.FindFirst("AccountId")?.Value;
+        var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
         if (!short.TryParse(userIdStr, out short claimId) || claimId != id)
         {

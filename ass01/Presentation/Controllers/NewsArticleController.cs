@@ -141,4 +141,26 @@ public class NewsArticleController : ControllerBase
             return NotFound(new { message = "NewsArticle not found." });
         }
     }
+
+    [HttpGet("my-history")]
+    [Authorize(Roles = "Staff")]
+    public async Task<IActionResult> GetMyHistory()
+    {
+        var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!short.TryParse(currentUserIdStr, out var currentUserId))
+            return Unauthorized();
+
+        // Pass createdById = currentUserId
+        // Other params are null to get all history
+        var articles = await _newsService.GetNewsArticlesAsync(
+            isStaff: true, 
+            keyword: null, 
+            categoryId: null, 
+            tagName: null, 
+            createdById: currentUserId, 
+            startDate: null, 
+            endDate: null);
+
+        return Ok(articles);
+    }
 }
