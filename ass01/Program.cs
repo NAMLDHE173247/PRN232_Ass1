@@ -36,6 +36,7 @@ builder.Services.AddScoped<ass01.BusinessLogic.Services.IAccountService, ass01.B
 builder.Services.AddScoped<ass01.BusinessLogic.Services.ICategoryService, ass01.BusinessLogic.Services.CategoryService>();
 builder.Services.AddScoped<ass01.BusinessLogic.Services.ITagService, ass01.BusinessLogic.Services.TagService>();
 builder.Services.AddScoped<ass01.BusinessLogic.Services.INewsArticleService, ass01.BusinessLogic.Services.NewsArticleService>();
+builder.Services.AddScoped<ass01.BusinessLogic.Services.IReportService, ass01.BusinessLogic.Services.ReportService>();
 
 // Configure OData EDM Model
 static IEdmModel GetEdmModel()

@@ -13,4 +13,5 @@ public interface INewsArticleRepository
     Task UpdateNewsArticleAsync(NewsArticle article);
     Task DeleteNewsArticleAsync(NewsArticle article);
     Task<List<NewsArticle>> GetRelatedNewsArticlesAsync(string articleId, short? categoryId, List<int> tagIds);
+    Task<List<NewsArticle>> GetReportArticlesAsync(DateTime startDate, DateTime endDate);
 }

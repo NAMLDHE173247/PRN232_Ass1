@@ -81,4 +81,15 @@ public class NewsArticleDAO : INewsArticleDAO
             .Take(3)
             .ToListAsync();
     }
+
+    public async Task<List<NewsArticle>> GetReportArticlesAsync(DateTime startDate, DateTime endDate)
+    {
+        return await _context.NewsArticles
+            .Include(n => n.Category)
+            .Include(n => n.Tags)
+            .Include(n => n.CreatedBy)
+            .Where(n => n.CreatedDate >= startDate && n.CreatedDate <= endDate)
+            .OrderByDescending(n => n.CreatedDate)
+            .ToListAsync();
+    }
 }
