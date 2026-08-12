@@ -166,6 +166,48 @@
             </div>`;
         }
 
+        async function loadTable() {
+            const keyword = document.querySelector('input[name="keyword"]').value || '';
+            const role = document.querySelector('select[name="role"]').value || '';
+            
+            try {
+                const res = await fetch(`/Account/GetList?keyword=${encodeURIComponent(keyword)}&role=${role}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const tbody = document.querySelector('table tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No accounts found.</td></tr>';
+                        return;
+                    }
+                    
+                    data.forEach(acc => {
+                        let roleBadge = '<span class="badge bg-secondary">Unknown</span>';
+                        if(acc.accountRole === 1) roleBadge = '<span class="badge bg-primary">Staff</span>';
+                        else if(acc.accountRole === 2) roleBadge = '<span class="badge bg-info">Lecturer</span>';
+                        else if(acc.accountRole === 3) roleBadge = '<span class="badge bg-danger">Admin</span>';
+                        
+                        // Sanitize to prevent XSS in rendering
+                        const escName = acc.accountName ? acc.accountName.replace(/'/g, "\\'") : '';
+                        
+                        tbody.innerHTML += `<tr>
+                            <td>${acc.accountId}</td>
+                            <td>${acc.accountName}</td>
+                            <td>${acc.accountEmail}</td>
+                            <td>${roleBadge}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="openEditModal(${acc.accountId}, '${escName}', '${acc.accountEmail}', ${acc.accountRole})">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAccount(${acc.accountId})">Delete</button>
+                            </td>
+                        </tr>`;
+                    });
+                }
+            } catch(e) {
+                console.error("Failed to reload table", e);
+            }
+        }
+
         async function createAccount() {
             const form = document.getElementById('createForm');
             if (!form.checkValidity()) {
@@ -193,7 +235,11 @@
                 });
                 const res = await response.json();
                 if (response.ok) {
-                    location.reload();
+                    showAlert(res.message, 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('createModal')).hide();
+                    form.reset();
+                    form.classList.remove('was-validated');
+                    await loadTable();
                 } else {
                     showAlert(res.message || 'Failed to create', 'danger');
                     bootstrap.Modal.getInstance(document.getElementById('createModal')).hide();
@@ -243,7 +289,9 @@
                 });
                 const res = await response.json();
                 if (response.ok) {
-                    location.reload();
+                    showAlert(res.message, 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                    await loadTable();
                 } else {
                     showAlert(res.message || 'Failed to update', 'danger');
                     bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
@@ -263,7 +311,8 @@
                 const response = await fetch(`/Account/Delete/${id}`, { method: 'DELETE' });
                 const res = await response.json();
                 if (response.ok) {
-                    location.reload();
+                    showAlert(res.message, 'success');
+                    await loadTable();
                 } else {
                     showAlert(res.message || 'Failed to delete account', 'danger');
                 }

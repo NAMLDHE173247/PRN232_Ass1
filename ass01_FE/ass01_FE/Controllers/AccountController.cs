@@ -41,6 +41,15 @@ public class AccountController : Controller
         return View(accounts);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetList(string? keyword, short? role)
+    {
+        if (!IsAdmin()) return Unauthorized();
+        var token = GetToken();
+        var accounts = await _accountApiService.GetAccountsAsync(token, keyword, role);
+        return Json(accounts);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateAccountViewModel model)
     {
