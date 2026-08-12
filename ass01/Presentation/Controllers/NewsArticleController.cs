@@ -22,18 +22,26 @@ public class NewsArticleController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     [EnableQuery]
-    public async Task<IActionResult> GetNewsArticles()
+    public async Task<IActionResult> GetNewsArticles(
+        [FromQuery] string? keyword = null,
+        [FromQuery] short? categoryId = null,
+        [FromQuery] string? tagName = null,
+        [FromQuery] short? createdById = null,
+        [FromQuery] DateTime? startDate = null,
+        [FromQuery] DateTime? endDate = null)
     {
-        bool isStaff = User.IsInRole("Staff");
-        var articles = await _newsService.GetNewsArticlesAsync(isStaff);
+        bool isStaff = User.Identity?.IsAuthenticated == true && User.IsInRole("Staff");
+        var articles = await _newsService.GetNewsArticlesAsync(isStaff, keyword, categoryId, tagName, createdById, startDate, endDate);
         return Ok(articles);
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetNewsArticleById(string id)
     {
-        bool isStaff = User.IsInRole("Staff");
+        bool isStaff = User.Identity?.IsAuthenticated == true && User.IsInRole("Staff");
         var article = await _newsService.GetNewsArticleByIdAsync(id, isStaff);
         if (article == null) return NotFound(new { message = "NewsArticle not found." });
         return Ok(article);
@@ -100,7 +108,27 @@ public class NewsArticleController : ControllerBase
         }
     }
 
+    [HttpPost("{id}/duplicate")]
+    [Authorize(Roles = "Staff")]
+    public async Task<IActionResult> DuplicateNewsArticle(string id)
+    {
+        var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!short.TryParse(currentUserIdStr, out var currentUserId))
+            return Unauthorized();
+
+        try
+        {
+            var duplicated = await _newsService.DuplicateNewsArticleAsync(id, currentUserId);
+            return CreatedAtAction(nameof(GetNewsArticleById), new { id = duplicated.NewsArticleId }, duplicated);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new { message = "Original NewsArticle not found." });
+        }
+    }
+
     [HttpGet("{id}/related")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetRelatedNewsArticles(string id)
     {
         try

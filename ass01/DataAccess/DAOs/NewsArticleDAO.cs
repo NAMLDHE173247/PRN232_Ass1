@@ -66,25 +66,12 @@ public class NewsArticleDAO : INewsArticleDAO
         await _context.SaveChangesAsync();
     }
 
-    public async Task<bool> IsDuplicateTitleWithin24HoursAsync(string title, DateTime currentTime, string? excludeId = null)
-    {
-        var cutoff = currentTime.AddHours(-24);
-        var query = _context.NewsArticles
-            .Where(n => n.NewsTitle == title && n.CreatedDate >= cutoff);
-
-        if (!string.IsNullOrEmpty(excludeId))
-        {
-            query = query.Where(n => n.NewsArticleId != excludeId);
-        }
-
-        return await query.AnyAsync();
-    }
-
     public async Task<List<NewsArticle>> GetRelatedNewsArticlesAsync(string articleId, short? categoryId, List<int> tagIds)
     {
         var query = _context.NewsArticles
             .Include(n => n.Category)
             .Include(n => n.Tags)
+            .Include(n => n.CreatedBy)
             .Where(n => n.NewsArticleId != articleId && n.NewsStatus == true);
 
         return await query

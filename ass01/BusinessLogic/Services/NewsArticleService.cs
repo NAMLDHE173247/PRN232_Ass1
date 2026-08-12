@@ -20,10 +20,48 @@ public class NewsArticleService : INewsArticleService
         _tagRepo = tagRepo;
     }
 
-    public async Task<List<NewsArticleDto>> GetNewsArticlesAsync(bool isStaff)
+    public async Task<List<NewsArticleDto>> GetNewsArticlesAsync(bool isStaff, string? keyword = null, short? categoryId = null, string? tagName = null, short? createdById = null, DateTime? startDate = null, DateTime? endDate = null)
     {
         var articles = await _newsRepo.GetNewsArticlesAsync(isStaff);
-        return articles.Select(MapToDto).ToList();
+        var query = articles.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            var lowerKeyword = keyword.ToLower();
+            query = query.Where(a => 
+                (a.NewsTitle != null && a.NewsTitle.ToLower().Contains(lowerKeyword)) ||
+                (a.Headline != null && a.Headline.ToLower().Contains(lowerKeyword)) ||
+                (a.NewsContent != null && a.NewsContent.ToLower().Contains(lowerKeyword))
+            );
+        }
+
+        if (categoryId.HasValue)
+        {
+            query = query.Where(a => a.CategoryId == categoryId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(tagName))
+        {
+            var lowerTag = tagName.ToLower();
+            query = query.Where(a => a.Tags.Any(t => t.TagName != null && t.TagName.ToLower().Contains(lowerTag)));
+        }
+
+        if (createdById.HasValue)
+        {
+            query = query.Where(a => a.CreatedById == createdById.Value);
+        }
+
+        if (startDate.HasValue)
+        {
+            query = query.Where(a => a.CreatedDate >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            query = query.Where(a => a.CreatedDate <= endDate.Value);
+        }
+
+        return query.Select(MapToDto).ToList();
     }
 
     public async Task<NewsArticleDto?> GetNewsArticleByIdAsync(string id, bool isStaff)
@@ -35,10 +73,11 @@ public class NewsArticleService : INewsArticleService
 
     public async Task<NewsArticleDto> CreateNewsArticleAsync(CreateNewsArticleRequest request, short currentUserId)
     {
-        if (await _newsRepo.IsDuplicateTitleWithin24HoursAsync(request.NewsTitle, DateTime.UtcNow))
-            throw new ArgumentException("A news article with this title was already created within the last 24 hours.");
-
-        var newArticleId = DateTime.UtcNow.Ticks.ToString();
+        var newArticleId = DateTime.Now.Ticks.ToString();
+        while (await _newsRepo.GetNewsArticleByIdAsync(newArticleId, true) != null)
+        {
+            newArticleId = DateTime.Now.Ticks.ToString();
+        }
 
         var article = new NewsArticle
         {
@@ -50,13 +89,17 @@ public class NewsArticleService : INewsArticleService
             CategoryId = request.CategoryId,
             NewsStatus = request.NewsStatus,
             CreatedById = currentUserId,
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.Now
         };
 
         if (request.TagIds != null && request.TagIds.Any())
         {
             var allTags = await _tagRepo.GetTagsAsync();
             var validTags = allTags.Where(t => request.TagIds.Contains(t.TagId)).ToList();
+            if (validTags.Count != request.TagIds.Distinct().Count())
+            {
+                throw new ArgumentException("One or more tags do not exist.");
+            }
             foreach (var tag in validTags)
             {
                 article.Tags.Add(tag);
@@ -76,9 +119,6 @@ public class NewsArticleService : INewsArticleService
         if (article == null)
             throw new KeyNotFoundException("NewsArticle not found.");
 
-        if (await _newsRepo.IsDuplicateTitleWithin24HoursAsync(request.NewsTitle, DateTime.UtcNow, id))
-            throw new ArgumentException("A news article with this title was already created within the last 24 hours.");
-
         article.NewsTitle = request.NewsTitle;
         article.Headline = request.Headline;
         article.NewsContent = request.NewsContent;
@@ -86,13 +126,18 @@ public class NewsArticleService : INewsArticleService
         article.CategoryId = request.CategoryId;
         article.NewsStatus = request.NewsStatus;
         article.UpdatedById = currentUserId;
-        article.ModifiedDate = DateTime.UtcNow;
+        article.ModifiedDate = DateTime.Now;
 
         if (request.TagIds != null)
         {
             var allTags = await _tagRepo.GetTagsAsync();
             var newTags = allTags.Where(t => request.TagIds.Contains(t.TagId)).ToList();
             
+            if (newTags.Count != request.TagIds.Distinct().Count())
+            {
+                throw new ArgumentException("One or more tags do not exist.");
+            }
+
             article.Tags.Clear();
             foreach (var t in newTags)
             {
@@ -109,12 +154,46 @@ public class NewsArticleService : INewsArticleService
         if (article == null)
             throw new KeyNotFoundException("NewsArticle not found.");
 
-        // Need to clear tags first before deleting to satisfy FK constraints if cascade isn't working as expected,
-        // though EF Core handles cascade/ClientSetNull in memory if loaded. Let's explicitly clear.
         article.Tags.Clear();
         await _newsRepo.UpdateNewsArticleAsync(article);
 
         await _newsRepo.DeleteNewsArticleAsync(article);
+    }
+
+    public async Task<NewsArticleDto> DuplicateNewsArticleAsync(string id, short currentUserId)
+    {
+        var original = await _newsRepo.GetNewsArticleByIdAsync(id, true);
+        if (original == null)
+            throw new KeyNotFoundException("Original NewsArticle not found.");
+
+        var newArticleId = DateTime.Now.Ticks.ToString();
+        while (await _newsRepo.GetNewsArticleByIdAsync(newArticleId, true) != null)
+        {
+            newArticleId = DateTime.Now.Ticks.ToString();
+        }
+
+        var duplicated = new NewsArticle
+        {
+            NewsArticleId = newArticleId,
+            NewsTitle = original.NewsTitle,
+            Headline = original.Headline,
+            NewsContent = original.NewsContent,
+            NewsSource = original.NewsSource,
+            CategoryId = original.CategoryId,
+            NewsStatus = original.NewsStatus,
+            CreatedById = currentUserId,
+            CreatedDate = DateTime.Now
+        };
+
+        foreach (var tag in original.Tags)
+        {
+            duplicated.Tags.Add(tag);
+        }
+
+        await _newsRepo.AddNewsArticleAsync(duplicated);
+
+        var created = await _newsRepo.GetNewsArticleByIdAsync(newArticleId, true);
+        return MapToDto(created!);
     }
 
     public async Task<List<NewsArticleDto>> GetRelatedNewsArticlesAsync(string id)

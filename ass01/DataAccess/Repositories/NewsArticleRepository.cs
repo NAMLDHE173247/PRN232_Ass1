@@ -25,9 +25,6 @@ public class NewsArticleRepository : INewsArticleRepository
 
     public Task DeleteNewsArticleAsync(NewsArticle article) => _dao.DeleteNewsArticleAsync(article);
 
-    public Task<bool> IsDuplicateTitleWithin24HoursAsync(string title, DateTime currentTime, string? excludeId = null) 
-        => _dao.IsDuplicateTitleWithin24HoursAsync(title, currentTime, excludeId);
-
     public Task<List<NewsArticle>> GetRelatedNewsArticlesAsync(string articleId, short? categoryId, List<int> tagIds)
         => _dao.GetRelatedNewsArticlesAsync(articleId, categoryId, tagIds);
 }

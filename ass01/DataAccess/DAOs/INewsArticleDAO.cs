@@ -12,6 +12,5 @@ public interface INewsArticleDAO
     Task AddNewsArticleAsync(NewsArticle article);
     Task UpdateNewsArticleAsync(NewsArticle article);
     Task DeleteNewsArticleAsync(NewsArticle article);
-    Task<bool> IsDuplicateTitleWithin24HoursAsync(string title, DateTime currentTime, string? excludeId = null);
     Task<List<NewsArticle>> GetRelatedNewsArticlesAsync(string articleId, short? categoryId, List<int> tagIds);
 }

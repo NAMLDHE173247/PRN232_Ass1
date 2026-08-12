@@ -47,7 +47,7 @@ static IEdmModel GetEdmModel()
 
 builder.Services.AddControllers()
     .AddOData(options => options
-        .Select().Filter().OrderBy().Expand().SetMaxTop(100).SkipToken()
+        .Select().Filter().OrderBy().Expand().Count().SetMaxTop(100)
         .AddRouteComponents("odata", GetEdmModel())
     );
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
