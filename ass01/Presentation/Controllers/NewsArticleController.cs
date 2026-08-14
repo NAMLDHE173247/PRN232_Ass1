@@ -30,10 +30,12 @@ public class NewsArticleController : ControllerBase
         [FromQuery] string? tagName = null,
         [FromQuery] short? createdById = null,
         [FromQuery] DateTime? startDate = null,
-        [FromQuery] DateTime? endDate = null)
+        [FromQuery] DateTime? endDate = null,
+        [FromQuery] string? authorName = null,
+        [FromQuery] bool? newsStatus = null)
     {
         bool isStaff = User.Identity?.IsAuthenticated == true && User.IsInRole("Staff");
-        var articles = await _newsService.GetNewsArticlesAsync(isStaff, keyword, categoryId, tagName, createdById, startDate, endDate);
+        var articles = await _newsService.GetNewsArticlesAsync(isStaff, keyword, categoryId, tagName, createdById, startDate, endDate, authorName, newsStatus);
         return Ok(articles);
     }
 

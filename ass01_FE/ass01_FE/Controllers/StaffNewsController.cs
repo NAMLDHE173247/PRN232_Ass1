@@ -29,7 +29,7 @@ public class StaffNewsController : Controller
         return HttpContext.Session.GetString("AccessToken") ?? string.Empty;
     }
 
-    public async Task<IActionResult> Index(string? keyword, short? categoryId, string? tagName, DateTime? startDate, DateTime? endDate, int skip = 0, int top = 10)
+    public async Task<IActionResult> Index(string? keyword, short? categoryId, string? tagName, DateTime? startDate, DateTime? endDate, string? authorName, bool? newsStatus, int skip = 0, int top = 10)
     {
         if (!IsStaff())
         {
@@ -41,11 +41,13 @@ public class StaffNewsController : Controller
         ViewBag.TagName = tagName;
         ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
         ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
+        ViewBag.AuthorName = authorName;
+        ViewBag.NewsStatus = newsStatus;
         ViewBag.Skip = skip;
         ViewBag.Top = top;
 
         var token = GetToken();
-        var (items, count) = await _newsApiService.GetStaffNewsAsync(token, keyword, categoryId, tagName, startDate, endDate, skip, top);
+        var (items, count) = await _newsApiService.GetStaffNewsAsync(token, keyword, categoryId, tagName, startDate, endDate, authorName, newsStatus, skip, top);
         
         ViewBag.TotalCount = count;
         
@@ -57,11 +59,11 @@ public class StaffNewsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetList(string? keyword, short? categoryId, string? tagName, DateTime? startDate, DateTime? endDate, int skip = 0, int top = 10)
+    public async Task<IActionResult> GetList(string? keyword, short? categoryId, string? tagName, DateTime? startDate, DateTime? endDate, string? authorName, bool? newsStatus, int skip = 0, int top = 10)
     {
         if (!IsStaff()) return Unauthorized();
         var token = GetToken();
-        var (items, count) = await _newsApiService.GetStaffNewsAsync(token, keyword, categoryId, tagName, startDate, endDate, skip, top);
+        var (items, count) = await _newsApiService.GetStaffNewsAsync(token, keyword, categoryId, tagName, startDate, endDate, authorName, newsStatus, skip, top);
         return Json(new { items, count });
     }
 

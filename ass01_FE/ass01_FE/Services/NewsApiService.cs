@@ -84,7 +84,7 @@ public class NewsApiService
     // --- Staff Methods ---
 
     public async Task<(List<NewsArticleDto> Items, int TotalCount)> GetStaffNewsAsync(
-        string token, string? keyword = null, short? categoryId = null, string? tagName = null, DateTime? startDate = null, DateTime? endDate = null, int skip = 0, int top = 10)
+        string token, string? keyword = null, short? categoryId = null, string? tagName = null, DateTime? startDate = null, DateTime? endDate = null, string? authorName = null, bool? newsStatus = null, int skip = 0, int top = 10)
     {
         AddAuthHeader(token);
         
@@ -94,6 +94,8 @@ public class NewsApiService
         if (!string.IsNullOrEmpty(tagName)) query.Add($"tagName={System.Uri.EscapeDataString(tagName)}");
         if (startDate.HasValue) query.Add($"startDate={startDate.Value:yyyy-MM-dd}");
         if (endDate.HasValue) query.Add($"endDate={endDate.Value:yyyy-MM-dd}");
+        if (!string.IsNullOrEmpty(authorName)) query.Add($"authorName={System.Uri.EscapeDataString(authorName)}");
+        if (newsStatus.HasValue) query.Add($"newsStatus={newsStatus.Value.ToString().ToLower()}");
 
         var url = "api/news?" + string.Join("&", query);
         var response = await _httpClient.GetAsync(url);

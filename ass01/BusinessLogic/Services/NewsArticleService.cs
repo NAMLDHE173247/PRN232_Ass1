@@ -20,7 +20,7 @@ public class NewsArticleService : INewsArticleService
         _tagRepo = tagRepo;
     }
 
-    public async Task<List<NewsArticleDto>> GetNewsArticlesAsync(bool isStaff, string? keyword = null, short? categoryId = null, string? tagName = null, short? createdById = null, DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<List<NewsArticleDto>> GetNewsArticlesAsync(bool isStaff, string? keyword = null, short? categoryId = null, string? tagName = null, short? createdById = null, DateTime? startDate = null, DateTime? endDate = null, string? authorName = null, bool? newsStatus = null)
     {
         var articles = await _newsRepo.GetNewsArticlesAsync(isStaff);
         var query = articles.AsQueryable();
@@ -59,6 +59,17 @@ public class NewsArticleService : INewsArticleService
         if (endDate.HasValue)
         {
             query = query.Where(a => a.CreatedDate <= endDate.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(authorName))
+        {
+            var lowerAuthor = authorName.ToLower();
+            query = query.Where(a => a.CreatedBy != null && a.CreatedBy.AccountName != null && a.CreatedBy.AccountName.ToLower().Contains(lowerAuthor));
+        }
+
+        if (newsStatus.HasValue)
+        {
+            query = query.Where(a => a.NewsStatus == newsStatus.Value);
         }
 
         return query.Select(MapToDto).ToList();

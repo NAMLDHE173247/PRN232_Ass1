@@ -45,6 +45,18 @@
                 <input type="text" name="tagName" value="@ViewBag.TagName" class="form-control" placeholder="Tag..." />
             </div>
             <div class="col-md-2">
+                <label class="form-label">Author Name</label>
+                <input type="text" name="authorName" value="@ViewBag.AuthorName" class="form-control" placeholder="Author..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Status</label>
+                <select name="newsStatus" class="form-select">
+                    <option value="">All</option>
+                    <option value="true" selected="@(ViewBag.NewsStatus == true)">Active</option>
+                    <option value="false" selected="@(ViewBag.NewsStatus == false)">Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
                 <label class="form-label">Start Date</label>
                 <input type="date" name="startDate" value="@ViewBag.StartDate" class="form-control" />
             </div>
@@ -134,7 +146,7 @@
             {
                 int pSkip = (i - 1) * top;
                 <li class="page-item @(i == currentPage ? "active" : "")">
-                    <a class="page-link" href="?keyword=@ViewBag.Keyword&categoryId=@ViewBag.CategoryId&tagName=@ViewBag.TagName&startDate=@ViewBag.StartDate&endDate=@ViewBag.EndDate&skip=@pSkip&top=@top">@i</a>
+                    <a class="page-link" href="?keyword=@ViewBag.Keyword&categoryId=@ViewBag.CategoryId&tagName=@ViewBag.TagName&authorName=@ViewBag.AuthorName&newsStatus=@ViewBag.NewsStatus&startDate=@ViewBag.StartDate&endDate=@ViewBag.EndDate&skip=@pSkip&top=@top">@i</a>
                 </li>
             }
         </ul>
@@ -288,18 +300,20 @@
         }
 
         async function loadTable() {
-            // Collect all search params
             const keyword = document.querySelector('input[name="keyword"]').value || '';
             const categoryId = document.querySelector('select[name="categoryId"]').value || '';
             const tagName = document.querySelector('input[name="tagName"]').value || '';
+            const authorName = document.querySelector('input[name="authorName"]').value || '';
+            const newsStatus = document.querySelector('select[name="newsStatus"]').value || '';
             const startDate = document.querySelector('input[name="startDate"]').value || '';
             const endDate = document.querySelector('input[name="endDate"]').value || '';
             const top = document.querySelector('select[name="top"]').value || 10;
             const skip = @skip; // keep current skip
 
             try {
-                let url = `/StaffNews/GetList?keyword=${encodeURIComponent(keyword)}&tagName=${encodeURIComponent(tagName)}&skip=${skip}&top=${top}`;
+                let url = `/StaffNews/GetList?keyword=${encodeURIComponent(keyword)}&tagName=${encodeURIComponent(tagName)}&authorName=${encodeURIComponent(authorName)}&skip=${skip}&top=${top}`;
                 if (categoryId) url += `&categoryId=${categoryId}`;
+                if (newsStatus) url += `&newsStatus=${newsStatus}`;
                 if (startDate) url += `&startDate=${startDate}`;
                 if (endDate) url += `&endDate=${endDate}`;
                 
