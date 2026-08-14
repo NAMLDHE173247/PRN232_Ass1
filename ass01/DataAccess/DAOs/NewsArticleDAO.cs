@@ -22,6 +22,7 @@ public class NewsArticleDAO : INewsArticleDAO
             .Include(n => n.Category)
             .Include(n => n.Tags)
             .Include(n => n.CreatedBy)
+            .Include(n => n.UpdatedBy)
             .AsQueryable();
 
         if (!isStaff)
@@ -38,6 +39,7 @@ public class NewsArticleDAO : INewsArticleDAO
             .Include(n => n.Category)
             .Include(n => n.Tags)
             .Include(n => n.CreatedBy)
+            .Include(n => n.UpdatedBy)
             .AsQueryable();
 
         if (!isStaff)
@@ -72,6 +74,7 @@ public class NewsArticleDAO : INewsArticleDAO
             .Include(n => n.Category)
             .Include(n => n.Tags)
             .Include(n => n.CreatedBy)
+            .Include(n => n.UpdatedBy)
             .Where(n => n.NewsArticleId != articleId && n.NewsStatus == true);
 
         return await query
@@ -88,6 +91,7 @@ public class NewsArticleDAO : INewsArticleDAO
             .Include(n => n.Category)
             .Include(n => n.Tags)
             .Include(n => n.CreatedBy)
+            .Include(n => n.UpdatedBy)
             .Where(n => n.CreatedDate >= startDate && n.CreatedDate <= endDate)
             .OrderByDescending(n => n.CreatedDate)
             .ToListAsync();

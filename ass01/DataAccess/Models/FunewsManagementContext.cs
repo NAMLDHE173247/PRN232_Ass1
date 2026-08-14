@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -68,6 +68,10 @@ public partial class FunewsManagementContext : DbContext
                 .HasForeignKey(d => d.CreatedById)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_NewsArticle_SystemAccount");
+
+            entity.HasOne(d => d.UpdatedBy).WithMany()
+                .HasForeignKey(d => d.UpdatedById)
+                .HasConstraintName("FK_NewsArticle_SystemAccount_UpdatedBy");
 
             entity.HasMany(d => d.Tags).WithMany(p => p.NewsArticles)
                 .UsingEntity<Dictionary<string, object>>(

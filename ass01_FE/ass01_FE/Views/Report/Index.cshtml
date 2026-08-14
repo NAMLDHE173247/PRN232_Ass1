@@ -126,8 +126,10 @@
                             <th>Title</th>
                             <th>Category</th>
                             <th>Author</th>
+                            <th>Updated By</th>
                             <th>Status</th>
                             <th>Created Date</th>
+                            <th>Modified Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,6 +139,7 @@
                                 <td>@article.NewsTitle</td>
                                 <td>@article.CategoryName</td>
                                 <td>@article.CreatedByName</td>
+                                <td>@article.UpdatedByName</td>
                                 <td>
                                     @if (article.NewsStatus == true)
                                     {
@@ -148,11 +151,12 @@
                                     }
                                 </td>
                                 <td>@article.CreatedDate?.ToString("MMM dd, yyyy")</td>
+                                <td>@article.ModifiedDate?.ToString("MMM dd, yyyy")</td>
                             </tr>
                         }
                         @if (!Model.Statistics.Articles.Any())
                         {
-                            <tr><td colspan="5" class="text-center text-muted">No articles found in this period.</td></tr>
+                            <tr><td colspan="7" class="text-center text-muted">No articles found in this period.</td></tr>
                         }
                     </tbody>
                 </table>

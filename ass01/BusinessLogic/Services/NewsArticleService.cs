@@ -225,6 +225,7 @@ public class NewsArticleService : INewsArticleService
             CreatedById = a.CreatedById,
             CreatedByName = a.CreatedBy?.AccountName,
             UpdatedById = a.UpdatedById,
+            UpdatedByName = a.UpdatedBy?.AccountName,
             ModifiedDate = a.ModifiedDate,
             Tags = a.Tags.Select(t => new TagDto
             {

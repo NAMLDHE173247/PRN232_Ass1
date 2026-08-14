@@ -80,6 +80,8 @@
                 <th>Tags</th>
                 <th>Status</th>
                 <th>Created</th>
+                <th>Updated By</th>
+                <th>Modified</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -103,6 +105,8 @@
                             else { <span class="badge bg-secondary">Inactive</span> }
                         </td>
                         <td>@news.CreatedDate?.ToString("yyyy-MM-dd")</td>
+                        <td>@news.UpdatedByName</td>
+                        <td>@news.ModifiedDate?.ToString("yyyy-MM-dd")</td>
                         <td>
                             @{
                                 var tagsJson = System.Text.Json.JsonSerializer.Serialize(news.Tags.Select(t => t.TagId));
@@ -116,7 +120,7 @@
             }
             else
             {
-                <tr><td colspan="7" class="text-center text-muted">No news articles found.</td></tr>
+                <tr><td colspan="9" class="text-center text-muted">No news articles found.</td></tr>
             }
         </tbody>
     </table>
@@ -306,7 +310,7 @@
                     tbody.innerHTML = '';
                     
                     if (!data.items || data.items.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No news articles found.</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No news articles found.</td></tr>';
                         return;
                     }
                     
@@ -314,6 +318,7 @@
                         let statusBadge = news.newsStatus ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>';
                         let tagsHtml = (news.tags || []).map(t => `<span class="badge bg-secondary me-1">${t.tagName}</span>`).join('');
                         let createdDate = news.createdDate ? new Date(news.createdDate).toISOString().split('T')[0] : '';
+                        let modifiedDate = news.modifiedDate ? new Date(news.modifiedDate).toISOString().split('T')[0] : '';
                         
                         const escTitle = news.newsTitle ? news.newsTitle.replace(/'/g, "\\'") : '';
                         const escHeadline = news.headline ? news.headline.replace(/'/g, "\\'") : '';
@@ -329,6 +334,8 @@
                             <td>${tagsHtml}</td>
                             <td>${statusBadge}</td>
                             <td>${createdDate}</td>
+                            <td>${news.updatedByName || ''}</td>
+                            <td>${modifiedDate}</td>
                             <td>
                                 <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('${news.newsArticleId}', '${escTitle}', '${escHeadline}', '${escContent}', '${escSource}', ${news.categoryId !== null ? news.categoryId : 'null'}, ${news.newsStatus}, ${tagsJson.replace(/"/g, "&quot;")})">Edit</button>
                                 <button class="btn btn-sm btn-outline-info" onclick="duplicateNews('${news.newsArticleId}')">Duplicate</button>
