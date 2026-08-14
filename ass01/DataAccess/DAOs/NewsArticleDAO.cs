@@ -30,7 +30,7 @@ public class NewsArticleDAO : INewsArticleDAO
             query = query.Where(n => n.NewsStatus == true);
         }
 
-        return await query.ToListAsync();
+        return await query.OrderByDescending(n => n.CreatedDate).ToListAsync();
     }
 
     public async Task<NewsArticle?> GetNewsArticleByIdAsync(string id, bool isStaff)
@@ -92,7 +92,7 @@ public class NewsArticleDAO : INewsArticleDAO
             .Include(n => n.Tags)
             .Include(n => n.CreatedBy)
             .Include(n => n.UpdatedBy)
-            .Where(n => n.CreatedDate >= startDate && n.CreatedDate <= endDate)
+            .Where(n => n.CreatedDate >= startDate && n.CreatedDate < endDate.Date.AddDays(1))
             .OrderByDescending(n => n.CreatedDate)
             .ToListAsync();
     }

@@ -27,7 +27,7 @@ public class NewsApiService
 
     public async Task<(List<NewsArticleDto> Items, int TotalCount)> GetActiveNewsAsync(string? keyword = null, int skip = 0, int top = 5)
     {
-        var url = $"api/news?$skip={skip}&$top={top}&$count=true";
+        var url = $"api/news?$skip={skip}&$top={top}&$count=true&$orderby=CreatedDate desc";
         if (!string.IsNullOrEmpty(keyword))
         {
             url += $"&keyword={System.Uri.EscapeDataString(keyword)}";
@@ -88,7 +88,7 @@ public class NewsApiService
     {
         AddAuthHeader(token);
         
-        var query = new List<string> { $"$skip={skip}", $"$top={top}", "$count=true" };
+        var query = new List<string> { $"$skip={skip}", $"$top={top}", "$count=true", "$orderby=CreatedDate desc" };
         if (!string.IsNullOrEmpty(keyword)) query.Add($"keyword={System.Uri.EscapeDataString(keyword)}");
         if (categoryId.HasValue) query.Add($"categoryId={categoryId.Value}");
         if (!string.IsNullOrEmpty(tagName)) query.Add($"tagName={System.Uri.EscapeDataString(tagName)}");

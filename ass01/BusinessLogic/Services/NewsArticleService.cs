@@ -58,7 +58,8 @@ public class NewsArticleService : INewsArticleService
 
         if (endDate.HasValue)
         {
-            query = query.Where(a => a.CreatedDate <= endDate.Value);
+            var endOfDay = endDate.Value.Date.AddDays(1);
+            query = query.Where(a => a.CreatedDate < endOfDay);
         }
 
         if (!string.IsNullOrWhiteSpace(authorName))

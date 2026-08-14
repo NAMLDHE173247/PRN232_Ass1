@@ -61,12 +61,12 @@ public partial class FunewsManagementContext : DbContext
 
             entity.HasOne(d => d.Category).WithMany(p => p.NewsArticles)
                 .HasForeignKey(d => d.CategoryId)
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_NewsArticle_Category");
 
             entity.HasOne(d => d.CreatedBy).WithMany(p => p.NewsArticles)
                 .HasForeignKey(d => d.CreatedById)
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_NewsArticle_SystemAccount");
 
             entity.HasOne(d => d.UpdatedBy).WithMany()
