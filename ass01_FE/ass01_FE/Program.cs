@@ -1,9 +1,16 @@
-using ass01_FE.Services;
+using ass01_FE.DataAccess.Services;
+using ass01_FE.BusinessLogic.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddRazorOptions(options =>
+    {
+        options.ViewLocationFormats.Clear();
+        options.ViewLocationFormats.Add("/Presentation/Views/{1}/{0}.cshtml");
+        options.ViewLocationFormats.Add("/Presentation/Views/Shared/{0}.cshtml");
+    });
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -21,6 +28,7 @@ builder.Services.AddHttpClient<CategoryApiService>();
 builder.Services.AddHttpClient<TagApiService>();
 builder.Services.AddHttpClient<ProfileApiService>();
 
+builder.Services.AddScoped<NewsViewService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
